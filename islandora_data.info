@@ -1,0 +1,8 @@
+name = "Islandora data"
+description = "An Islandora Repository module to handle spreadsheet and CSV-style delimited data"
+dependencies[] = islandora
+package = Islandora
+core = 7.x
+version = 7.x-1.2
+configure = admin/islandora/data
+stylesheets[all][] = css/islandora_data.theme.css
