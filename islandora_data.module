@@ -2,25 +2,16 @@
 
 /**
  * @file
- * Handles the creation and display of basic image objects.
+ * Handles the creation and display of tabular data objects.
  */
 
 /**
  * Implements hook_theme().
- *
- * We supply a pattern so we can overide templates at the theme level if needed.
- * we can append a pid to a template and the new template file will be called
- * (the pids colon should be replaced with a dash).
  */
 function islandora_data_theme($existing, $type, $theme, $path) {
   return array(
     'islandora_data' => array(
       'template' => 'theme/islandora-data',
-      // We can add PIDs to the end of this pattern in our preprocess function
-      // and templates will be able to have have a pid appended to the
-      // template name to overide a template on a per object basis.
-      // An example template might be named:
-      // "islandora-basic-image--islandora-27.tpl.php".
       'pattern' => 'islandora_data__',
       'variables' => array('islandora_object' => NULL),
     ),
@@ -32,7 +23,7 @@ function islandora_data_theme($existing, $type, $theme, $path) {
  */
 function islandora_data_islandora_required_objects(IslandoraTuque $connection) {
   $module_path = drupal_get_path('module', 'islandora_data');
-  // Image Content Model.
+  // Tabular data Content Model.
   $data_content_model = $connection->repository->constructObject('islandora:sp_data');
   $data_content_model->owner = 'fedoraAdmin';
   $data_content_model->label = 'Islandora Tabular Data Content Model';
@@ -120,16 +111,21 @@ function islandora_data_preprocess_islandora_data(array &$variables) {
   $variables['theme_hook_suggestions'][] = 'islandora_data__' . str_replace(':', '_', $islandora_object->id);
   $variables['parent_collections'] = islandora_get_parents_from_rels_ext($islandora_object);
   global $base_url;
+
+/*
   // Original.
   if (isset($islandora_object['OBJ']) && islandora_datastream_access(FEDORA_VIEW_OBJECTS, $islandora_object['OBJ'])) {
-    $full_size_url = url("islandora/object/{$islandora_object->id}/datastream/OBJ/view", array('absolute' => TRUE));
-    $variables['islandora_full_url'] = $full_size_url;
+    $orig_file_url = url("islandora/object/{$islandora_object->id}/datastream/OBJ/view", array('absolute' => TRUE));
+    $variables['islandora_orig_url'] = $orig_file_url;
     $params = array(
       'title' => $islandora_object->label,
-      'path' => $full_size_url,
+      'path' => $orig_file_url,
     );
-    $variables['islandora_full_img'] = theme('image', $params);
+    // $variables['islandora_orig_file'] = theme('islandora_data', $params);
+    $variables['islandora_content'] = l("Download file", $orig_file_url, array('html' => TRUE));
   }
+*/
+
   // Thumbnail.
   if (isset($islandora_object['TN']) && islandora_datastream_access(FEDORA_VIEW_OBJECTS, $islandora_object['TN'])) {
     $thumbnail_size_url = url("islandora/object/{$islandora_object->id}/datastream/TN/view");
@@ -139,23 +135,15 @@ function islandora_data_preprocess_islandora_data(array &$variables) {
     );
     $variables['islandora_thumbnail_img'] = theme('image', $params);
   }
-/*
-  // Medium size.
-  if (isset($islandora_object['MEDIUM_SIZE']) && islandora_datastream_access(FEDORA_VIEW_OBJECTS, $islandora_object['MEDIUM_SIZE'])) {
-    $medium_size_url = url("islandora/object/{$islandora_object->id}/datastream/MEDIUM_SIZE/view");
-    $params = array(
-      'title' => $islandora_object->label,
-      'path' => $medium_size_url,
-    );
-    $variables['islandora_medium_img'] = theme('image', $params);
-    if (isset($full_size_url)) {
-      $variables['islandora_content'] = l($variables['islandora_medium_img'], $full_size_url, array('html' => TRUE));
-    }
-    else {
-      $variables['islandora_content'] = $variables['islandora_medium_img'];
-    }
+
+  // CSV datastream. During development, just present a link to the CSV_DATA datastream.
+  // Goal will be to assign $variables['islandora_content'] the URL of the
+  // CSV viewer so it shows up in the item display.
+  if (isset($islandora_object['CSV_DATA']) && islandora_datastream_access(FEDORA_VIEW_OBJECTS, $islandora_object['CSV_DATA'])) {
+    $csv_data_url = url("islandora/object/{$islandora_object->id}/datastream/CSV_DATA/view", array('absolute' => TRUE));
+    $variables['islandora_content'] = l(t("Download CSV version: ") . $islandora_object->label, $csv_data_url, array('html' => TRUE));
   }
-*/
+
 }
 
 /**
