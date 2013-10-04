@@ -43,12 +43,13 @@ function islandora_data_create_all_derivatives(AbstractObject $object) {
   $file_uri = file_create_filename($file_name, 'temporary://');
   // Populate the OBJ datastream with the uploaded file.
   $object['OBJ']->getContent($file_uri);
-  if (($output_file_uri = islandora_data_get_csv_version($file_uri, $ext)) !== FALSE) {
-      $fh = fopen('filename.txt','r');
+  islandora_data_get_csv_version($file_uri, $ext);
+  $fh = fopen('csvlist','r');
       while ($line = fgets($fh)) {
-      islandora_data_add_datastream($line, 'CSV_DATA', $output_file_uri);
+      islandora_data_add_datastream($object, 'CSV_DATA', $line)
     }
-    fclose($fh)
+    fclose($fh);
+    file_delete('csvlist')
   }
   file_unmanaged_delete($file_uri);
 
@@ -89,17 +90,6 @@ function islandora_data_get_csv_version($file_uri, $ext) {
       // to the 'csv' output file.
       $command = 'python csvnormalize.py ' . $input_file_path;
       exec($command, $output, $ret);
-      // If $command was successful, $success will contain return code 0.
-      if ($ret == '0') {
-        return $output_file_path;
-      }
-    case 'csv':
-      // During development, don't process the input file, just return its path.
-      return $input_file_path;
-      
-    default:
-      // I.e., none of the cases apply.
-      return FALSE;
   }
 }
 
