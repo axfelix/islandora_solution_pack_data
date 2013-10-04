@@ -21,7 +21,7 @@ function islandora_data_upload_form(array $form, array &$form_state) {
   $extensions = array('xls xlsx csv ods');
   return array(
     'file' => array(
-      '#title' => t('Image'),
+      '#title' => t('Data'),
       '#type' => 'managed_file',
       '#required' => TRUE,
       '#description' => t('Select image to upload.<br/>Files must be less than <b>@size MB.</b><br/>Allowed file types: <b>@ext.</b>', array('@size' => $upload_size, '@ext' => $extensions[0])),

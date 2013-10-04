@@ -14,7 +14,7 @@
 function islandora_data_create_all_derivatives(AbstractObject $object) {
   $mime_detect = new MimeDetect();
   if (!isset($object['OBJ'])) {
-    drupal_set_message(t('Could not create image derivatives for %s. No image file was uploaded.', array('%s' => $object->id)), 'error');
+    drupal_set_message(t('Could not normalize %s. No valid file was uploaded.', array('%s' => $object->id)), 'error');
     return "";
   }
   $ext = $mime_detect->getExtension($object['OBJ']->mimeType);
@@ -44,7 +44,11 @@ function islandora_data_create_all_derivatives(AbstractObject $object) {
   // Populate the OBJ datastream with the uploaded file.
   $object['OBJ']->getContent($file_uri);
   if (($output_file_uri = islandora_data_get_csv_version($file_uri, $ext)) !== FALSE) {
-    islandora_data_add_datastream($object, 'CSV_DATA', $output_file_uri);
+      $fh = fopen('filename.txt','r');
+      while ($line = fgets($fh)) {
+      islandora_data_add_datastream($line, 'CSV_DATA', $output_file_uri);
+    }
+    fclose($fh)
   }
   file_unmanaged_delete($file_uri);
 
@@ -83,7 +87,7 @@ function islandora_data_get_csv_version($file_uri, $ext) {
       
       // During development, we just dump the output of the 'file' command
       // to the 'csv' output file.
-      $command = '/usr/bin/file ' . $input_file_path . ' >> ' . $output_file_path;
+      $command = 'python csvnormalize.py ' . $input_file_path;
       exec($command, $output, $ret);
       // If $command was successful, $success will contain return code 0.
       if ($ret == '0') {
