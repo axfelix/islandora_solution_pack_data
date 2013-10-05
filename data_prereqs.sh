@@ -1,4 +1,4 @@
-#!bin/bash
+#!/bin/bash
 
 if [ -n "$(command -v yum)" ]; then
 sudo yum -y install nodejs
