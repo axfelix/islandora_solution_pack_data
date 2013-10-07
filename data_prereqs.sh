@@ -15,12 +15,12 @@ sudo apt-get -y install gnumeric
 fi
 
 sudo npm install ethercalc
-echo 'redis-server\nethercalc --expire 86400' > ethercalc
-sudo mv ethercalc /etc/init.d/ethercalc
-chmod +x /etc/init.d/ethercalc
-update-rc.d ethercalc defaults
+echo -e 'redis-server\nethercalc --expire 86400' > etherstart
+sudo mv etherstart /etc/init.d/etherstart
+chmod +x /etc/init.d/etherstart
+sudo update-rc.d ethercalc defaults
 
 sudo pip install csvkit
 
-redis-server
-ethercalc
+redis-server&
+ethercalc&
