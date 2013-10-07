@@ -44,13 +44,20 @@ function islandora_data_create_all_derivatives(AbstractObject $object) {
   // Populate the OBJ datastream with the uploaded file.
   $object['OBJ']->getContent($file_uri);
   islandora_data_get_csv_version($file_uri, $ext);
-  $fh = fopen('csvlist','r');
+  // The current process ID was passed to csvnormalize.py as a parameter so it
+  // knows what output file to write to. Here, we grab the process ID so we can
+  // read that file.
+  $current_process_id = getmypid();
+  $csvlist_filepath = '/tmp/csvlist.' . $current_process_id;
+  // dd($csvlist_filepath, "CSV list filepath for reading");
+  $fh = fopen($csvlist_filepath, 'r');
     while ($line = fgets($fh)) {
-    islandora_data_add_datastream($object, 'CSV_DATA', $line)
+      $file_basename = basename($line);
+      // @mjtodo: Add each datastream in the 'csvlist' file. They will be named after the worksheet, e.g. 'foo', 'bar'.
+      islandora_data_add_datastream($object, 'CSV_DATA_' . $file_basename, $line);
     }
   fclose($fh);
-  file_delete('csvlist')
-  }
+  // file_delete($csvlist_filepath);
   file_unmanaged_delete($file_uri);
 
   file_delete($original_file);
@@ -88,7 +95,10 @@ function islandora_data_get_csv_version($file_uri, $ext) {
       
       // During development, we just dump the output of the 'file' command
       // to the 'csv' output file.
-      $command = 'python csvnormalize.py ' . $input_file_path;
+      // Get the current process ID so we can ensure a unique filename for the output
+      // of csvnormalize.py.
+      $current_process_id = getmypid();
+      $command = 'python csvnormalize.py ' . $input_file_path . ' ' . $current_process_id;
       exec($command, $output, $ret);
   }
 }

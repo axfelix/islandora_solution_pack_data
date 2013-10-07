@@ -112,20 +112,6 @@ function islandora_data_preprocess_islandora_data(array &$variables) {
   $variables['parent_collections'] = islandora_get_parents_from_rels_ext($islandora_object);
   global $base_url;
 
-/*
-  // Original.
-  if (isset($islandora_object['OBJ']) && islandora_datastream_access(FEDORA_VIEW_OBJECTS, $islandora_object['OBJ'])) {
-    $orig_file_url = url("islandora/object/{$islandora_object->id}/datastream/OBJ/view", array('absolute' => TRUE));
-    $variables['islandora_orig_url'] = $orig_file_url;
-    $params = array(
-      'title' => $islandora_object->label,
-      'path' => $orig_file_url,
-    );
-    // $variables['islandora_orig_file'] = theme('islandora_data', $params);
-    $variables['islandora_content'] = l("Download file", $orig_file_url, array('html' => TRUE));
-  }
-*/
-
   // Thumbnail.
   if (isset($islandora_object['TN']) && islandora_datastream_access(FEDORA_VIEW_OBJECTS, $islandora_object['TN'])) {
     $thumbnail_size_url = url("islandora/object/{$islandora_object->id}/datastream/TN/view");
@@ -136,12 +122,41 @@ function islandora_data_preprocess_islandora_data(array &$variables) {
     $variables['islandora_thumbnail_img'] = theme('image', $params);
   }
 
+  $datastreams = array();
+  foreach ($islandora_object as $ds) {
+    try {
+      $pid = $islandora_object->id;
+      $id = $ds->id;
+      $label = $ds->label;
+      $download_path = islandora_datastream_get_url($ds, 'Download the ' . $label . ' version');
+      $datastreams[$id]['id'] = $id;
+      $datastreams[$id]['label'] = $label;
+      $datastreams[$id]['label_link'] = islandora_datastream_access(FEDORA_VIEW_OBJECTS, $ds) ?
+        l($label, $download_path) :
+        $label;
+      $datastreams[$id]['download_url'] = $download_path;
+      $datastreams[$id]['mimetype'] = $ds->mimetype;
+      $datastreams[$id]['size'] = islandora_datastream_get_human_readable_size($ds);
+      $datastreams[$id]['created_date'] = $ds->createdDate->format("Y-m-d");
+      $datastreams[$id]['class'] = drupal_strtolower(preg_replace('/[^A-Za-z0-9]/', '-', $id));
+    }
+    catch (RepositoryException $e) {
+    }
+  }
+  $variables['csv_datastreams'] = $datastreams;
+
   // CSV datastream. During development, just present a link to the CSV_DATA datastream.
   // Goal will be to assign $variables['islandora_content'] the URL of the
   // CSV viewer so it shows up in the item display.
   if (isset($islandora_object['CSV_DATA']) && islandora_datastream_access(FEDORA_VIEW_OBJECTS, $islandora_object['CSV_DATA'])) {
     $csv_data_url = url("islandora/object/{$islandora_object->id}/datastream/CSV_DATA/view", array('absolute' => TRUE));
-    $variables['islandora_content'] = l(t("Download CSV version: ") . $islandora_object->label, $csv_data_url, array('html' => TRUE));
+    // $variables['islandora_content'] = l(t("Download CSV version: ") . $islandora_object->label, $csv_data_url, array('html' => TRUE));
+    $variables['islandora_content'] = '';
+    foreach ($datastreams as $csv_datastream_id => $csv_datastream_properties) {
+      if (preg_match('/^CSV_DATA/', $csv_datastream_id)) {
+        $variables['islandora_content'] .= l(t("Download CSV version: ") . $csv_datastream_properties['label_link'], $csv_datastream_properties['download_url'], array('html' => TRUE));
+      }
+    }
   }
 
 }
