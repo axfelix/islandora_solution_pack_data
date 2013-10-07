@@ -47,6 +47,7 @@ function islandora_data_create_all_derivatives(AbstractObject $object) {
   $fh = fopen('csvlist','r');
     while ($line = fgets($fh)) {
     islandora_data_add_datastream($object, 'CSV_DATA', $line)
+    file_delete($line)
     }
   fclose($fh);
   file_delete('csvlist')
@@ -90,6 +91,8 @@ function islandora_data_get_csv_version($file_uri, $ext) {
       // to the 'csv' output file.
       $command = 'python csvnormalize.py ' . $input_file_path;
       exec($command, $output, $ret);
+    case 'csv':
+      file_put_contents('csvlist',$input_file_path);
   }
 }
 
