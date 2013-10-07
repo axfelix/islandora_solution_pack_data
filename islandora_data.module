@@ -153,9 +153,15 @@ function islandora_data_preprocess_islandora_data(array &$variables) {
     $csv_data_url = url("islandora/object/{$islandora_object->id}/datastream/CSV_DATA/view", array('absolute' => TRUE));
     $variables['islandora_content'] = '';
     foreach ($datastreams as $csv_datastream_id => $csv_datastream_properties) {
-      // We only want to present links to datastreams that begin with 'CSV_DATA'.
+      // We only want to present links to the Ethercalc URLs for datastreams that begin with 'CSV_DATA'.
       // There will be one per worksheet in the Excel and OpenOffice files.
       if (preg_match('/^CSV_DATA/', $csv_datastream_id)) {
+        // @todo: Add the Ethercalc viewer instantiation here, and change the URLs below to
+        // point to them:
+        // 1) url -i -H "Content-Type: text/csv" -X POST --data-binary @islandora_foo.csv http://localhost:8000/_
+        //   which return which returns the header: Location: /_/zmy8gm660u
+        // 2) Ethercalc renders a Javascript viewer at curl http://localhost:8000/zmy8gm660u 
+        // We want the viewer to appear in a new browser window. 
         $variables['islandora_content'] .= l(t("Download CSV version: ") . $csv_datastream_properties['label_link'], $csv_datastream_properties['download_url'], array('html' => TRUE));
       }
     }
