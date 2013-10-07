@@ -15,7 +15,7 @@ sudo apt-get -y install gnumeric
 fi
 
 npm install ethercalc
-echo "redis-server\nethercalc" > ethercalc
+echo 'redis-server\nethercalc --expire 86400' > ethercalc
 sudo mv ethercalc /etc/init.d/ethercalc
 chmod +x /etc/init.d/ethercalc
 update-rc.d ethercalc defaults

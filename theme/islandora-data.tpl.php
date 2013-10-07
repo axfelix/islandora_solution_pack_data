@@ -12,7 +12,9 @@
   <div class="islandora-basic-image-content-wrapper clearfix">
     <?php if (isset($islandora_content)): ?>
       <div class="islandora-basic-image-content">
-        <?php print $islandora_content; ?>
+        <?php print $islandora_content; 
+        exec('curl -i -H "Content-Type: text/csv" -X POST --data-binary @'.$islandora_content.' http://localhost:8000/');
+        ?>
       </div>
     <?php endif; ?>
   <div class="islandora-basic-image-sidebar">
