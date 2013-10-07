@@ -38,7 +38,7 @@ function islandora_data_create_all_derivatives(AbstractObject $object) {
   $ds->setContentFromFile("$path/images/data.png");
   $object->ingestDatastream($ds);
 
-  // Add CSV datastream.
+  // Add CSV datastream(s). There will be one per worksheet in the Excel and OpenOffice Calc files.
   $file_name = str_replace(":", "-", $object->id) . ".OBJ.{$ext}";
   $file_uri = file_create_filename($file_name, 'temporary://');
   // Populate the OBJ datastream with the uploaded file.
@@ -49,7 +49,6 @@ function islandora_data_create_all_derivatives(AbstractObject $object) {
   // read that file.
   $current_process_id = getmypid();
   $csvlist_filepath = '/tmp/csvlist.' . $current_process_id;
-  // dd($csvlist_filepath, "CSV list filepath for reading");
   $fh = fopen($csvlist_filepath, 'r');
     while ($line = fgets($fh)) {
       $file_basename = basename($line);
@@ -57,6 +56,7 @@ function islandora_data_create_all_derivatives(AbstractObject $object) {
       islandora_data_add_datastream($object, 'CSV_DATA_' . $file_basename, $line);
     }
   fclose($fh);
+  // During development, don't delete these files. In production, delete them.
   // file_delete($csvlist_filepath);
   file_unmanaged_delete($file_uri);
 
@@ -93,15 +93,13 @@ function islandora_data_get_csv_version($file_uri, $ext) {
       // $real_path, i.e., the input and output paths are the same. If this is
       // a problem, you will need to make a temporary copy of the file for input.
       
-      // During development, we just dump the output of the 'file' command
-      // to the 'csv' output file.
       // Get the current process ID so we can ensure a unique filename for the output
       // of csvnormalize.py.
       $current_process_id = getmypid();
       $command = 'python csvnormalize.py ' . $input_file_path . ' ' . $current_process_id;
       exec($command, $output, $ret);
     case 'csv':
-      file_put_contents('csvlist',$input_file_path);
+      file_put_contents('csvlist', $input_file_path);
   }
 }
 
