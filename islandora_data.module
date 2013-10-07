@@ -122,6 +122,8 @@ function islandora_data_preprocess_islandora_data(array &$variables) {
     $variables['islandora_thumbnail_img'] = theme('image', $params);
   }
 
+  // Here we get all the datastreams in the current object and put them in an array
+  // so we can display links to their Ethercalc renditions to the end user.
   $datastreams = array();
   foreach ($islandora_object as $ds) {
     try {
@@ -141,18 +143,18 @@ function islandora_data_preprocess_islandora_data(array &$variables) {
       $datastreams[$id]['class'] = drupal_strtolower(preg_replace('/[^A-Za-z0-9]/', '-', $id));
     }
     catch (RepositoryException $e) {
+      // @todo: Display error to end user?
     }
   }
   $variables['csv_datastreams'] = $datastreams;
 
-  // CSV datastream. During development, just present a link to the CSV_DATA datastream.
-  // Goal will be to assign $variables['islandora_content'] the URL of the
-  // CSV viewer so it shows up in the item display.
+  // CSV datastream(s). 
   if (isset($islandora_object['CSV_DATA']) && islandora_datastream_access(FEDORA_VIEW_OBJECTS, $islandora_object['CSV_DATA'])) {
     $csv_data_url = url("islandora/object/{$islandora_object->id}/datastream/CSV_DATA/view", array('absolute' => TRUE));
-    // $variables['islandora_content'] = l(t("Download CSV version: ") . $islandora_object->label, $csv_data_url, array('html' => TRUE));
     $variables['islandora_content'] = '';
     foreach ($datastreams as $csv_datastream_id => $csv_datastream_properties) {
+      // We only want to present links to datastreams that begin with 'CSV_DATA'.
+      // There will be one per worksheet in the Excel and OpenOffice files.
       if (preg_match('/^CSV_DATA/', $csv_datastream_id)) {
         $variables['islandora_content'] .= l(t("Download CSV version: ") . $csv_datastream_properties['label_link'], $csv_datastream_properties['download_url'], array('html' => TRUE));
       }
