@@ -6,6 +6,24 @@
  */
 
 /**
+ * Implements hook_menu().
+ */
+function islandora_data_menu() {
+  $items = array();
+  $items['admin/islandora/tabulardata'] = array(
+    'title' => 'Tabular Data Solution Pack',
+    'description' => 'Configure the Islandora Tabluar Data Solution Pack.',
+    'page callback' => 'drupal_get_form',
+    'access arguments' => array('administer site configuration'),
+    'page arguments' => array('islandora_data_admin_settings'),
+    'file' => 'includes/admin.form.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+  return $items;
+}
+
+
+/**
  * Implements hook_theme().
  */
 function islandora_data_theme($existing, $type, $theme, $path) {
