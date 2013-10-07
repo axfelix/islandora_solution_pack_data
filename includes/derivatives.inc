@@ -45,11 +45,11 @@ function islandora_data_create_all_derivatives(AbstractObject $object) {
   $object['OBJ']->getContent($file_uri);
   islandora_data_get_csv_version($file_uri, $ext);
   $fh = fopen('csvlist','r');
-      while ($line = fgets($fh)) {
-      islandora_data_add_datastream($object, 'CSV_DATA', $line)
+    while ($line = fgets($fh)) {
+    islandora_data_add_datastream($object, 'CSV_DATA', $line)
     }
-    fclose($fh);
-    file_delete('csvlist')
+  fclose($fh);
+  file_delete('csvlist')
   }
   file_unmanaged_delete($file_uri);
 
