@@ -14,7 +14,7 @@ sudo apt-get -y install redis-server
 sudo apt-get -y install gnumeric
 fi
 
-sudo npm install ethercalc
+sudo npm install -g ethercalc
 echo -e 'redis-server\nethercalc --expire 86400' > etherstart
 sudo mv etherstart /etc/init.d/etherstart
 chmod +x /etc/init.d/etherstart
@@ -22,5 +22,5 @@ sudo update-rc.d ethercalc defaults
 
 sudo pip install csvkit
 
-redis-server&
-ethercalc&
+nohup redis-server&
+nohup ethercalc --expire 86400&
