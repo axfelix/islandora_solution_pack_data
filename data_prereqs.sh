@@ -14,7 +14,7 @@ sudo apt-get -y install redis-server
 sudo apt-get -y install gnumeric
 fi
 
-npm install ethercalc
+sudo npm install ethercalc
 echo 'redis-server\nethercalc --expire 86400' > ethercalc
 sudo mv ethercalc /etc/init.d/ethercalc
 chmod +x /etc/init.d/ethercalc
