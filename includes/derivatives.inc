@@ -100,6 +100,8 @@ function islandora_data_get_csv_version($file_uri, $ext) {
       $current_process_id = getmypid();
       $command = 'python csvnormalize.py ' . $input_file_path . ' ' . $current_process_id;
       exec($command, $output, $ret);
+    case 'csv':
+      file_put_contents('csvlist',$input_file_path);
   }
 }
 
