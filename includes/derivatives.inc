@@ -50,16 +50,16 @@ function islandora_data_create_all_derivatives(AbstractObject $object) {
   $current_process_id = getmypid();
   $csvlist_filepath = '/tmp/csvlist.' . $current_process_id;
   $fh = fopen($csvlist_filepath, 'r');
-    while ($line = fgets($fh)) {
-      $file_basename = basename($line);
-      // @mjtodo: Add each datastream in the 'csvlist' file. They will be named after the worksheet, e.g. 'foo', 'bar'.
-      islandora_data_add_datastream($object, 'CSV_DATA_' . $file_basename, $line);
-    }
+  while ($line = fgets($fh)) {
+    $file_basename = basename($line);
+    // Add each datastream in the 'csvlist' file. Each one will be named after the 
+    // worksheet from which it is derived, e.g. 'CSV_DATA_foo', 'CSV_DATA_bar', etc.
+    islandora_data_add_datastream($object, 'CSV_DATA_' . $file_basename, $line);
+  }
   fclose($fh);
   // During development, don't delete these files. In production, delete them.
   // file_delete($csvlist_filepath);
   file_unmanaged_delete($file_uri);
-
   file_delete($original_file);
 }
 
