@@ -3,6 +3,8 @@ from subprocess import call
 import openpyxl
 import re
 
+# argv[2] is the process ID passed from inc/derivatives.inc.
+# We need this to avoid nameing conflicts on the csvlist file.
 csvlist_filepath = '/tmp/csvlist.' + sys.argv[2]
 
 # argv for filename here
