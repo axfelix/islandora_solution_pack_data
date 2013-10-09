@@ -1,4 +1,7 @@
-<dsCompositeModel xmlns="info:fedora/fedora-system:def/dsCompositeModel#"> <!-- using this as a guide -->
+<!-- According to documentation for function islandora_get_missing_datastreams_requirements(),
+   the DS-COMPOSITE-MODEL defines datastreams that are required for objects, but not already present.
+-->
+<dsCompositeModel xmlns="info:fedora/fedora-system:def/dsCompositeModel#">
   <dsTypeModel ID="DC" >
       <form FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" MIME="text/xml"></form>
   </dsTypeModel>
@@ -8,25 +11,18 @@
   <dsTypeModel ID="RELS-INT" optional="true">
       <form FORMAT_URI="info:fedora/fedora-system:FedoraRELSInt-1.0" MIME="application/rdf+xml"></form>
   </dsTypeModel>
+
+  <!-- Note: we will need to replace MODS with DDI. -->
   <dsTypeModel ID="MODS" optional="true">
     <form FORMAT_URI="http://www.loc.gov/mods/v3" MIME="text/xml"></form>
   </dsTypeModel>
-  <dsTypeModel ID="TECHMD" optional="true">
-    <form MIME="text/xml"></form>
-  </dsTypeModel>
+
   <dsTypeModel ID="TN" ORDERED="false" optional="true">
     <form MIME="image/jpg"></form>
   </dsTypeModel>
-<!--
-  <dsTypeModel ID="MEDIUM_SIZE" ORDERED="false" optional="true">
-    <form MIME="image/jpg"></form>
-  </dsTypeModel>
--->
-<!--
   <dsTypeModel ID="OBJ">
     <form MIME="application/vnd.ms-excel"></form>
     <form MIME="application/vnd.oasis.opendocument.spreadsheet"></form>
     <form MIME="text/csv"></form>
   </dsTypeModel>
-  -->
 </dsCompositeModel>
