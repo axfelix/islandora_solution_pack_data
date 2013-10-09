@@ -20,7 +20,7 @@ function islandora_data_create_all_derivatives(AbstractObject $object) {
   $ext = $mime_detect->getExtension($object['OBJ']->mimeType);
   $file_name = str_replace(':', '-', $object->id);
 
-  // Create a file object.
+  // Create a file object for the uploaded file.
   $file_uri = file_create_filename("{$file_name}.OBJ.{$ext}", 'temporary://');
   $file = new stdClass();
   $file->uri = $file_uri;
@@ -40,15 +40,21 @@ function islandora_data_create_all_derivatives(AbstractObject $object) {
   $ds->setContentFromFile("$path/images/data.png");
   $object->ingestDatastream($ds);
 
-  // Add CSV datastream(s). There will be one per worksheet in the Excel and OpenOffice Calc files.
-  // The current process ID was passed to csvnormalize.py as a parameter so it
+  // Add CSV datastream(s). There will be one per worksheet in the Excel 
+  // and OpenOffice Calc files.
+  $derivs_source_filepath = file_unmanaged_copy($original_file->uri, 'temporary://' . 
+    $file_name . '.derivs.' . $ext, FILE_EXISTS_REPLACE);
+
+  // The current process ID will be passed to csvnormalize.py as a parameter so it
   // knows what output file to write to. Here, we grab the process ID so we can
   // read that file.
   $current_process_id = getmypid();
-
-  $derivs_source_filepath = file_unmanaged_copy($original_file->uri, 'temporary://' . $file_name . '.derivs.' . $ext, FILE_EXISTS_REPLACE);
   $csvlist_filepath = '/tmp/csvlist.' . $current_process_id;
+
   islandora_data_generate_csv_datastreams($derivs_source_filepath, $ext);
+
+  // Open the derivatives list file written to by csvnormalize.py and add the 
+  // CSV datastream identifed in each line of the file.
   $fh = fopen($csvlist_filepath, 'r');
   $worksheet_number = 0;
   while ($line = fgets($fh)) {
@@ -62,50 +68,41 @@ function islandora_data_create_all_derivatives(AbstractObject $object) {
     islandora_data_add_datastream($object, 'CSV_DATA_' . $worksheet_number, trim($line));
   }
   fclose($fh);
-  // During development, don't delete these files. In production, delete them.
+  // @todo: During development, don't delete these files. In production, delete them.
   // file_delete($csvlist_filepath);
   // file_unmanaged_delete($derivs_source_file);
 }
 
 /**
  * Extract the CSV content from the uploaded file. Each worksheet in the
- * Excel or OpenOffice file will have one .csv DS.
+ * Excel or OpenOffice file will have one .csv datastream.
  *
  * @param string $file_uri
  *   The Drupal URI of a copy of the OBJ file to extract CSV content from.
  * @param string $ext
  *   The extension of the file.
- *
- * @return string $output_file_path
- *   The absolute path to the output file.
  */
 function islandora_data_generate_csv_datastreams($derivs_filepath, $ext) {
   $output = array();
   $input_file_path = drupal_realpath($derivs_filepath);
-  $output_file_path = $input_file_path . '.csv';
+  // Get the current process ID so we can ensure a unique filename for the output
+  // of csvnormalize.py.
   $current_process_id = getmypid();
   
-  // During development, apply the linux 'file' command to .xls, .xlsx,
-  // and .ods files and redirect the output to $output_file_path. Return the
-  // path to this file so the file can be used as the content of the CSV_DATA
-  // datastream. For .csv files, return the original file path, so the .csv file
-  // will be used as the content of the CSV_DATA datastream.
+  // For spreadsheet files, geneate a .csv for each worksheet by calling
+  // csvnormalize.py. For native .csv files, return the original file path, in which
+  // case the .csv file will be used as the content of the CSV_DATA datastream.
   switch ($ext) {
     case 'xls':
     case 'xlsx':
     case 'ods':
       // Extract the CSV content from files with these extensions.
-      // The output of your extraction command needs to write the results to
-      // $real_path, i.e., the input and output paths are the same. If this is
-      // a problem, you will need to make a temporary copy of the file for input.
-      
-      // Get the current process ID so we can ensure a unique filename for the output
-      // of csvnormalize.py.
       // $command = 'python /home/mark/Documents/apache_thinkpad/drupal7/sites/default/modules/islandora_solution_pack_data/csvnormalize.py ' . $input_file_path . ' ' . $current_process_id;
       $command = 'python /home/mark/Documents/apache_thinkpad/drupal7/sites/default/modules/islandora_solution_pack_data/csvnormalize.py ' . '/tmp/test_ds.csv' . ' ' . $current_process_id;
       dd($command, 'Command');
       exec($command, $output, $ret);
     case 'csv':
+      // Skip csvnormalize.py and just write the path to the native .csv file to the derivatives list.
       file_put_contents('/tmp/csvlist.' . $current_process_id, $input_file_path . "\n");
   }
 }
