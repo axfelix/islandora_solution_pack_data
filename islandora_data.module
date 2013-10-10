@@ -140,47 +140,42 @@ function islandora_data_preprocess_islandora_data(array &$variables) {
     $variables['islandora_thumbnail_img'] = theme('image', $params);
   }
 
-  // Here we get all the datastreams in the current object and put them in an array
-  // so we can display links to their Ethercalc renditions to the end user.
-  $datastreams = array();
-  foreach ($islandora_object as $ds) {
-    try {
-      $pid = $islandora_object->id;
-      $id = $ds->id;
-      $label = $ds->label;
-      $download_path = islandora_datastream_get_url($ds, 'Download the ' . $label . ' version');
-      $datastreams[$id]['id'] = $id;
-      $datastreams[$id]['label'] = $label;
-      $datastreams[$id]['label_link'] = islandora_datastream_access(FEDORA_VIEW_OBJECTS, $ds) ?
-        l($label, $download_path) :
-        $label;
-      $datastreams[$id]['download_url'] = $download_path;
-      $datastreams[$id]['mimetype'] = $ds->mimetype;
-      $datastreams[$id]['size'] = islandora_datastream_get_human_readable_size($ds);
-      $datastreams[$id]['created_date'] = $ds->createdDate->format("Y-m-d");
-      $datastreams[$id]['class'] = drupal_strtolower(preg_replace('/[^A-Za-z0-9]/', '-', $id));
-    }
-    catch (RepositoryException $e) {
-      // @todo: Display error to end user?
-    }
-  }
-  $variables['csv_datastreams'] = $datastreams;
-
   // CSV datastream(s). 
-  if (isset($islandora_object['CSV_DATA']) && islandora_datastream_access(FEDORA_VIEW_OBJECTS, $islandora_object['CSV_DATA'])) {
+  // if (isset($islandora_object['CSV_DATA']) && islandora_datastream_access(FEDORA_VIEW_OBJECTS, $islandora_object['CSV_DATA'])) {
+  if (isset($islandora_object['OBJ']) && islandora_datastream_access(FEDORA_VIEW_OBJECTS, $islandora_object['OBJ'])) {
     $csv_data_url = url("islandora/object/{$islandora_object->id}/datastream/CSV_DATA/view", array('absolute' => TRUE));
     $variables['islandora_content'] = '';
-    foreach ($datastreams as $csv_datastream_id => $csv_datastream_properties) {
+    // Create a new cURL resource
+    $ch = curl_init();
+    // foreach ($datastreams as $csv_datastream_id => $csv_datastream_properties) {
+    foreach ($islandora_object as $ds) {
       // We only want to present links to the Ethercalc URLs for datastreams that begin with 'CSV_DATA'.
       // There will be one per worksheet in the Excel and OpenOffice files.
-      if (preg_match('/^CSV_DATA/', $csv_datastream_id)) {
-        // @todo: Add the Ethercalc viewer instantiation here, and change the URLs below to
-        // point to them:
-        // 1) url -i -H "Content-Type: text/csv" -X POST --data-binary @islandora_foo.csv http://localhost:8000/_
+      // if (preg_match('/^CSV_DATA/', $csv_datastream_id)) {
+      if (preg_match('/^CSV_DATA/', $ds->id)) {
+        // Add the Ethercalc viewer instantiation of the CSV derivative here. For example:
+        // 1) curl -i -H "Content-Type: text/csv" -X POST --data-binary @islandora_foo.csv http://localhost:8000/_
         //   which return which returns the header: Location: /_/zmy8gm660u
+
+        // Download the datastream and save it to a temp file so we can POST it to ethercalc.
+        $current_process_id = getmypid();
+        $ds_content_file_path = '/tmp/' . $ds->id . '.' . $current_process_id;
+        $ds->getContent($ds_content_file_path);
+        $ds_content_file_size = filesize($ds_content_file_path);
+        $ds_content_file_handle = fopen($ds_content_file_path, "rb");
+
+        $command = 'curl -i -H "Content-Type: text/csv" -X POST --data-binary @' . $ds_content_file_path . 
+          ' http://localhost:8000/_';
+        exec($command, $output, $ret);
+        $ethercalc_path = end($output);
+
         // 2) Ethercalc renders a Javascript viewer at curl http://localhost:8000/zmy8gm660u 
         // We want the viewer to appear in a new browser window. 
-        $variables['islandora_content'] .= l(t("Download CSV version: ") . $csv_datastream_properties['label_link'], $csv_datastream_properties['download_url'], array('html' => TRUE));
+        $variables['islandora_content'] .= l(t("View @dsid in Ethercalc", array('@dsid' => $ds->id) ), url('http://localhost:8000' . $ethercalc_path,
+          array('absolute' => TRUE, 'external' => TRUE)), 
+          array('attributes' => array('target' => '_blank', 'title' => t('Opens Ethercalc in a new tab')))
+        );
+        file_unmanaged_delete($ds_content_file_path);
       }
     }
   }

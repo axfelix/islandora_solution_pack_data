@@ -65,8 +65,8 @@ function islandora_data_create_all_derivatives(AbstractObject $object) {
     $file_basename = basename(trim($deriv_path));
     // Add each datastream in the 'csvlist' file. Each one will be named after the 
     // worksheet from which it is derived, e.g. 'CSV_DATA_foo', 'CSV_DATA_bar', etc.
-    islandora_data_add_datastream($object, 'CSV_DATA_' . $worksheet_number, trim($deriv_path));
-    // islandora_data_add_datastream($object, 'CSV_DATA_' . $worksheet_number, '/tmp/test_ds.csv');
+    // islandora_data_add_datastream($object, 'CSV_DATA_' . $worksheet_number, trim($deriv_path)); <-- production
+    islandora_data_add_datastream($object, 'CSV_DATA_' . $worksheet_number, '/tmp/test_ds.csv'); // <- dev
   }
   fclose($fh);
   // @todo: During development, don't delete these files. In production, delete them.
@@ -99,8 +99,9 @@ function islandora_data_generate_csv_datastreams($deriv_source_file_path, $ext) 
     case 'ods':
       // Extract the CSV content from files with these extensions.
       $path_to_csvnormalize_py = drupal_get_path('module', 'islandora_data');
-      $command = 'python ' . $path_to_csvnormalize_py . '/csvnormalize.py ' . $input_file_path . ' ' . $current_process_id;
-      // $command = 'python ' . $path_to_csvnormalize_py . '/csvnormalize.py ' . '/tmp/test_ds.csv' . ' ' . $current_process_id;
+      // $command = 'python ' . $path_to_csvnormalize_py . '/csvnormalize.py ' . $input_file_path . ' ' . $current_process_id;
+      // @todo: Command during dev.
+      $command = 'python ' . $path_to_csvnormalize_py . '/csvnormalize.py ' . '/tmp/test_ds.csv' . ' ' . $current_process_id;
       exec($command, $output, $ret);
       break;
     case 'csv':
