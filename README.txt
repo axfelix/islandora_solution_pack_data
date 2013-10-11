@@ -16,4 +16,3 @@ Running the installer script sets up a Redis-backed Ethercalc instance which is 
 
 Our script configures Ethercalc to run with the flag "expire -86400", which means that each of these Ethercalc document instances is automatically deleted one day (86400 seconds) after the last time it is edited. These are effectively temporary files and should be treated as such -- the generated URL can be shared for short-term collaboration, but we do not intend for a document editor to run on top of our repository; Ethercalc is mainly used to provide a nice in-browser view for CSV files.
 
-Markup in .css files untouched from Basic Image Solution Pack.
