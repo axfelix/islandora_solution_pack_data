@@ -197,7 +197,12 @@ function islandora_data_preprocess_islandora_data(array &$variables) {
     }
     // If curl didn't execute successfully, render a note to the user and the links to download the raw CSV files.
     else {
-      $variables['islandora_content'] = '<div class="messages warning">' . t("Sorry, the Ethercalc service is not responding so we can't display your CSV files. You can download them using the links below.") . '</div>';
+      if (count($ds_links) == 1) {
+        $variables['islandora_content'] = '<div class="messages warning">' . t("Sorry, the Ethercalc service is not responding so we can't display your CSV file. You can download it using the link below.") . '</div>';
+      }
+      else {
+        $variables['islandora_content'] = '<div class="messages warning">' . t("Sorry, the Ethercalc service is not responding so we can't display your CSV files. You can download them using the links below.") . '</div>';
+      }
       $variables['islandora_content'] .= theme('item_list', array('items' => $ds_links, 'title' => t('CSV files, one per worksheet'), 'type' => 'ul', 'attributes' => array()));
     }
   }
