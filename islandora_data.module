@@ -164,7 +164,6 @@ function islandora_data_preprocess_islandora_data(array &$variables) {
         $command = 'curl -i -H "Content-Type: text/csv" -X POST --data-binary @' . $ds_content_file_path . 
           ' ' . $ethercalc_host . '/_';
         exec($command, $output, $ret);
-        dd($ret, 'curl return');
         // The Ethercalc path is the last item in curl's output.
         $ethercalc_path = end($output);
 
