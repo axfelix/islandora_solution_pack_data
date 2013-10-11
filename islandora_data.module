@@ -163,15 +163,26 @@ function islandora_data_preprocess_islandora_data(array &$variables) {
         $command = 'curl -i -H "Content-Type: text/csv" -X POST --data-binary @' . $ds_content_file_path . 
           ' ' . $ethercalc_host . '/_';
         exec($command, $output, $ret);
+        dd($ret, 'curl return');
+        // The Ethercalc path is the last item in curl's output.
         $ethercalc_path = end($output);
 
         // 2) Ethercalc renders a Javascript viewer at curl http://example.com:8000/zmy8gm660u, which we
-        // want to appear in a new browser tab.. 
-        $link = l(t("View @dsid in Ethercalc", array('@dsid' => $ds->id) ), 
-          url($ethercalc_host . $ethercalc_path,
-          array('absolute' => TRUE, 'external' => TRUE)), 
-          array('attributes' => array('target' => '_blank', 'title' => t('Opens Ethercalc in a new tab')))
-        );
+        // want to appear in a new browser tab. If curl executed successfully, render links to the
+        // Ethercalc URLs.
+        if ($ret == '0') {
+          $link = l(t("View @dsid in Ethercalc", array('@dsid' => $ds->id) ), 
+            url($ethercalc_host . $ethercalc_path,
+            array('absolute' => TRUE, 'external' => TRUE)), 
+            array('attributes' => array('target' => '_blank', 'title' => t('Opens Ethercalc in a new tab')))
+          );
+        }
+        // If curl didn't execute successfully, render links to download the raw CSV files.
+        else {
+          $link = l(t("Download @dsid", array('@dsid' => $ds->id)), 
+            islandora_datastream_get_url($ds, $type = 'download')
+          );
+        }
 
         $ds_links[] = $link;
 
@@ -179,7 +190,16 @@ function islandora_data_preprocess_islandora_data(array &$variables) {
         file_unmanaged_delete($ds_content_file_path);
       }
     }
-    $variables['islandora_content'] = theme('item_list', array('items' => $ds_links, 'title' => t('CSV files, one per worksheet'), 'type' => 'ul', 'attributes' => array()));
+
+    // If curl executed successfully, just render the links.
+    if ($ret == '0') {
+      $variables['islandora_content'] = theme('item_list', array('items' => $ds_links, 'title' => t('CSV files, one per worksheet'), 'type' => 'ul', 'attributes' => array()));
+    }
+    // If curl didn't execute successfully, render a note to the user and the links to download the raw CSV files.
+    else {
+      $variables['islandora_content'] = '<div class="messages warning">' . t("Sorry, the Ethercalc service is not responding so we can't display your CSV files. You can download them using the links below.") . '</div>';
+      $variables['islandora_content'] .= theme('item_list', array('items' => $ds_links, 'title' => t('CSV files, one per worksheet'), 'type' => 'ul', 'attributes' => array()));
+    }
   }
 }
 
