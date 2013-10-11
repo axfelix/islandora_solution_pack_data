@@ -14,7 +14,8 @@
 function islandora_data_create_all_derivatives(AbstractObject $object) {
   $mime_detect = new MimeDetect();
   if (!isset($object['OBJ'])) {
-    drupal_set_message(t('Could not normalize %s. No valid file was uploaded.', array('%s' => $object->id)), 'error');
+    drupal_set_message(t('Could not normalize %s. No valid file was uploaded.', 
+      array('%s' => $object->id)), 'error');
     return "";
   }
   $ext = $mime_detect->getExtension($object['OBJ']->mimeType);
@@ -99,9 +100,11 @@ function islandora_data_generate_csv_datastreams($deriv_source_file_path, $ext) 
     case 'ods':
       // Extract the CSV content from files with these extensions.
       $path_to_csvnormalize_py = drupal_get_path('module', 'islandora_data');
-      // $command = 'python ' . $path_to_csvnormalize_py . '/csvnormalize.py ' . $input_file_path . ' ' . $current_process_id;
+      // $command = 'python ' . $path_to_csvnormalize_py . '/csvnormalize.py ' . 
+        // $input_file_path . ' ' . $current_process_id;
       // @todo: Command during dev.
-      $command = 'python ' . $path_to_csvnormalize_py . '/csvnormalize.py ' . '/tmp/test_ds.csv' . ' ' . $current_process_id;
+      $command = 'python ' . $path_to_csvnormalize_py . '/csvnormalize.py ' . 
+        '/tmp/test_ds.csv' . ' ' . $current_process_id;
       exec($command, $output, $ret);
       break;
     case 'csv':
