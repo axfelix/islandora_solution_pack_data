@@ -141,6 +141,8 @@ function islandora_data_preprocess_islandora_data(array &$variables) {
   }
 
   // CSV datastream(s). 
+  // First, define a default for the return code from curl.
+  $ret = 1;
   if (isset($islandora_object['OBJ']) && islandora_datastream_access(FEDORA_VIEW_OBJECTS, $islandora_object['OBJ'])) {
     $ds_links = array();
     foreach ($islandora_object as $ds) {
