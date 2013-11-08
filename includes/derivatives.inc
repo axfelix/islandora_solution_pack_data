@@ -59,20 +59,21 @@ function islandora_data_create_all_derivatives(AbstractObject $object) {
   // line of the file.
   $fh = fopen($csvlist_filepath, 'r');
   // @devel only: use an incrementor as the name of the worksheet. 
-  // @todo: Get the worksheet name from filename.
-  $worksheet_number = 0;
+  // @todo: Get the worksheet name from filename and use it after 'CSV_DATA_' as the DSID.
+  // $worksheet_number = 0;
   while ($deriv_path = fgets($fh)) {
-    $worksheet_number++;
+    // $worksheet_number++;
     $file_basename = basename(trim($deriv_path));
     // Add each datastream in the 'csvlist' file. Each one will be named after the 
     // worksheet from which it is derived, e.g. 'CSV_DATA_foo', 'CSV_DATA_bar', etc.
-    // islandora_data_add_datastream($object, 'CSV_DATA_' . $worksheet_number, trim($deriv_path)); <-- production
-    islandora_data_add_datastream($object, 'CSV_DATA_' . $worksheet_number, '/tmp/test_ds.csv'); // <- dev
+    // islandora_data_add_datastream($object, 'CSV_DATA_' . $worksheet_number, trim($deriv_path)); 
+    islandora_data_add_datastream($object, 'CSV_DATA_1', trim($deriv_path)); 
+    // islandora_data_add_datastream($object, 'CSV_DATA_' . $worksheet_number, '/tmp/test_ds.csv'); // <- dev
   }
   fclose($fh);
   // @todo: During development, don't delete these files. In production, delete them.
-  // file_delete($csvlist_filepath);
-  // file_unmanaged_delete($derivs_source_file);
+  file_unmanaged_delete($csvlist_filepath);
+  file_unmanaged_delete($derivs_source_filepath);
 }
 
 /**
