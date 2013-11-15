@@ -2,8 +2,10 @@
 
 if [ -n "$(command -v yum)" ]; then
 sudo yum -y install nodejs
-sudo yum -y install redis-server
+sudo yum -y install redis
 sudo yum -y install gnumeric
+sudo yum -y install python-pip
+sudo yum -y install npm
 fi
 
 if [ -n "$(command -v apt-get)" ]; then
@@ -18,7 +20,10 @@ sudo npm install -g ethercalc
 echo -e 'redis-server\nethercalc --expire 86400' > etherstart
 sudo mv etherstart /etc/init.d/etherstart
 chmod +x /etc/init.d/etherstart
+
+if [ -n "$(command -v apt-get)" ]; then
 sudo update-rc.d ethercalc defaults
+fi
 
 sudo pip install csvkit
 
