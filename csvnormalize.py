@@ -7,15 +7,18 @@ import copy
 
 # argv[2] is the process ID passed from inc/derivatives.inc.
 # We need this to avoid naming conflicts on the csvlist file.
-csvlist_filepath = '/tmp/csvlist.' + sys.argv[2] + '.'
+csvlist_file = '/tmp/csvlist.' + sys.argv[2]
+csvlist_fileobject = open(csvlist_file,'w')
+csvlist_filepath = csvlist_file + '.'
+nopath = re.sub(r'.*/','', sys.argv[1])
 
 # argv for filename here
 xlsx = re.search(r'\.xlsx', sys.argv[1])
 if xlsx is None:
-	xlsxname = re.sub(r'\.[A-Za-z]{3}$','.xlsx', sys.argv[1])
+	xlsxname = re.sub(r'\.[A-Za-z]{3}$','.xlsx', nopath)
 	# call(['ssconvert', sys.argv[1],xlsxname])
-	call(['ssconvert','--export-type=Gnumeric_Excel:xlsx',sys.argv[1],csvlist_filepath+xlsxname])
 	workbookname = csvlist_filepath+xlsxname
+	call(['ssconvert','--export-type=Gnumeric_Excel:xlsx',sys.argv[1],workbookname])
 else:
 	workbookname = sys.argv[1]
 workbook = openpyxl.load_workbook(workbookname)
@@ -37,8 +40,10 @@ if totalsheets!=1:
 			csvname = csvlist_filepath+cleanname+'.csv'
 			o = open(csvname, 'wb')
 			call(['in2csv',filename], stdout=o)
+			csvlist_fileobject.write(csvname+'\n')
 else:
-	csvname = re.sub(r'\.xlsx?','.csv', sys.argv[1])
-	print csvname
+	csvname = re.sub(r'\.xlsx?','.csv', nopath)
+	echo csvname
 	o = open(csvlist_filepath+csvname, 'wb')
 	call(['in2csv',workbookname], stdout=o)
+	csvlist_fileobject.write(csvname)
