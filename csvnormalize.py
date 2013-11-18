@@ -42,4 +42,4 @@ else:
 	csvname = re.sub(r'\.xlsx?','.csv', nopath)
 	o = open(csvlist_filepath+csvname, 'wb')
 	call(['in2csv',workbookname], stdout=o)
-	csvlist_fileobject.write(csvname)
+	csvlist_fileobject.write(csvlist_filepath+csvname)
