@@ -16,7 +16,6 @@ nopath = re.sub(r'.*/','', sys.argv[1])
 xlsx = re.search(r'\.xlsx', sys.argv[1])
 if xlsx is None:
 	xlsxname = re.sub(r'\.[A-Za-z]{3}$','.xlsx', nopath)
-	# call(['ssconvert', sys.argv[1],xlsxname])
 	workbookname = csvlist_filepath+xlsxname
 	call(['ssconvert','--export-type=Gnumeric_Excel:xlsx',sys.argv[1],workbookname])
 else:
@@ -26,11 +25,9 @@ sheets = workbook.get_sheet_names()
 totalsheets = len(sheets)
 if totalsheets!=1:
 	workbooks = {}
-	# for y in [1:totalsheets]:
 	for y in sheets:
 		if y != "DV-IDENTITY-0":
 			workbooks[y] = copy.deepcopy(workbook)
-			# for x in [1:totalsheets]:
 			for x in sheets:
 				if x != y:
 					workbooks[y].remove_sheet(workbooks[y].get_sheet_by_name(x))
@@ -43,7 +40,6 @@ if totalsheets!=1:
 			csvlist_fileobject.write(csvname+'\n')
 else:
 	csvname = re.sub(r'\.xlsx?','.csv', nopath)
-	echo csvname
 	o = open(csvlist_filepath+csvname, 'wb')
 	call(['in2csv',workbookname], stdout=o)
 	csvlist_fileobject.write(csvname)
