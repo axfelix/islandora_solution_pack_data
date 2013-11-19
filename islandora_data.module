@@ -173,7 +173,7 @@ function islandora_data_preprocess_islandora_data(array &$variables) {
         // want to appear in a new browser tab. If curl executed successfully, render links to the
         // Ethercalc URLs.
         if ($ret == '0') {
-          $link = l(t("View @dsid in Ethercalc", array('@dsid' => $ds->id) ), 
+          $link = l(t("View @ds_label in Ethercalc", array('@ds_label' => $ds->label) ), 
             url($ethercalc_host . $ethercalc_path,
             array('absolute' => TRUE, 'external' => TRUE)), 
             array('attributes' => array('target' => '_blank', 'title' => t('Opens Ethercalc in a new tab')))
