@@ -178,6 +178,16 @@ function islandora_data_preprocess_islandora_data(array &$variables) {
         // $output = curl_exec($ch); 
         // curl_close($ch);
 
+        // This seems to mostly work; just need to change how $output is handled. Example $output from the above:
+        // HTTP/1.1 201 Created
+        // X-Powered-By: Zappa 0.4.22
+        // Content-Type: text/plain; charset=utf-8
+        // Location: /_/xt6bcwqd38
+        // Content-Length: 11
+        // Date: Tue, 18 Feb 2014 23:42:07 GMT
+        // Connection: keep-alive
+
+        // Need to replace the below end($output) with some permutation of the Location: field from the above response. Haven't done this yet.
 
         // The Ethercalc path is the last item in curl's output.
         $ethercalc_path = end($output);
