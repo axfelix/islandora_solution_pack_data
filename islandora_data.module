@@ -149,9 +149,6 @@ function islandora_data_preprocess_islandora_data(array &$variables) {
       // We only want to present links to the Ethercalc URLs for datastreams that begin with 'CSV_DATA'.
       // There will be one per worksheet in the Excel and OpenOffice files.
       if (preg_match('/^CSV_DATA/', $ds->id)) {
-        // Add the Ethercalc viewer instantiation of the CSV derivative here. For example:
-        // 1) curl -i -H "Content-Type: text/csv" -X POST --data-binary @islandora_foo.csv http://example.com:8000/_
-        //   which return which returns the header: Location: /_/zmy8gm660u
 
         $ethercalc_host = variable_get('islandora_data_solution_pack_ethercalc_host', 'http://example.com:8000');
 
@@ -162,40 +159,23 @@ function islandora_data_preprocess_islandora_data(array &$variables) {
         $ds_content_file_size = filesize($ds_content_file_path);
         $ds_content_file_handle = fopen($ds_content_file_path, "rb");
 
-        // Call out to curl, for now anyway, since PHP's curl is a steaming pile of crap.
-        $command = 'curl -i -H "Content-Type: text/csv" -X POST --data-binary @' . $ds_content_file_path . 
-          ' ' . $ethercalc_host . '/_';
-        exec($command, $output, $ret);
+        // PHP Curl POST:
+        $curl_instance = curl_init();
+        curl_setopt($curl_instance, CURLOPT_URL, $ethercalc_host.'/_');
+        curl_setopt($curl_instance, CURLOPT_POST, 1);
+        curl_setopt($curl_instance, CURLOPT_POSTFIELDS, file_get_contents($ds_content_file_path));
+        curl_setopt($curl_instance, CURLOPT_HEADER, 1);
+        curl_setopt($curl_instance, CURLOPT_HTTPHEADER, array("Content-Type: text/csv"));
+        curl_setopt($curl_instance, CURLOPT_RETURNTRANSFER, 1);
+        $output = curl_exec($curl_instance); 
+        curl_close($curl_instance); 
 
-        // PHP Curl Testing:
-        // $ch = curl_init();
-        // curl_setopt($ch, CURLOPT_URL, $ethercalc_host.'/_');
-        // curl_setopt($ch, CURLOPT_POST, 1);
-        // curl_setopt($ch, CURLOPT_POSTFIELDS, file_get_contents($ds_content_file_path);
-        // curl_setopt($ch, CURLOPT_HEADER, 1);
-        // curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type: text/csv"));
-        // curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        // $output = curl_exec($ch); 
-        // curl_close($ch);
-
-        // This seems to mostly work; just need to change how $output is handled. Example $output from the above:
-        // HTTP/1.1 201 Created
-        // X-Powered-By: Zappa 0.4.22
-        // Content-Type: text/plain; charset=utf-8
-        // Location: /_/xt6bcwqd38
-        // Content-Length: 11
-        // Date: Tue, 18 Feb 2014 23:42:07 GMT
-        // Connection: keep-alive
-
-        // Need to replace the below end($output) with some permutation of the Location: field from the above response. Haven't done this yet.
-
-        // The Ethercalc path is the last item in curl's output.
-        $ethercalc_path = end($output);
+        $ethercalc_path = islandora_data_get_response_header($output, 'Location');
 
         // 2) Ethercalc renders a Javascript viewer at curl http://example.com:8000/zmy8gm660u, which we
         // want to appear in a new browser tab. If curl executed successfully, render links to the
         // Ethercalc URLs.
-        if ($ret == '0') {
+        if(curl_errno($curl_instance)==0) {
           $link = l(t("View @ds_label in Ethercalc", array('@ds_label' => $ds->label) ), 
             url($ethercalc_host . $ethercalc_path,
             array('absolute' => TRUE, 'external' => TRUE)), 
@@ -217,7 +197,7 @@ function islandora_data_preprocess_islandora_data(array &$variables) {
     }
 
     // If curl executed successfully, just render the links.
-    if ($ret == '0') {
+    if(curl_errno($curl_instance)==0) {
       $variables['islandora_content'] = theme('item_list', array('items' => $ds_links, 
         'title' => t('CSV files, one per worksheet'), 'type' => 'ul', 'attributes' => array()));
     }
@@ -279,3 +259,27 @@ function islandora_data_islandora_sp_data_islandora_ingest_steps() {
     ),
   );
 }
+
+/**
+ * Parses out a specific header value from the HTTP response.
+ *
+ * @param string $curl_result
+ *   The entire cURL result, as provided by curl_exec() with
+ *   curl_setopt($curl_instance, CURLOPT_RETURNTRANSFER, 1).
+ * @param string $wanted_header
+ *   The name of the header whose value you want, without the
+ *   trailing colon (:).
+ * @return bool|string
+ *   The value of the header, FALSE if header not found.
+ */
+function islandora_data_get_response_header($curl_result, $wanted_header) {
+  list($headers, $content) = explode("\r\n\r\n", $curl_result, 2);
+  foreach (explode("\r\n", $headers) as $header) {
+    if (preg_match('/'. preg_quote($wanted_header) . '/', $header)) {
+      $header_value = str_replace($wanted_header . ':', '', $header);
+      $cleaned_underscore = str_replace('_/','', $header_value);
+      return trim($cleaned_underscore);
+    }
+  }
+}
+
