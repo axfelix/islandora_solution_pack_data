@@ -167,8 +167,7 @@ function islandora_data_preprocess_islandora_data(array &$variables) {
         curl_setopt($curl_instance, CURLOPT_HEADER, 1);
         curl_setopt($curl_instance, CURLOPT_HTTPHEADER, array("Content-Type: text/csv"));
         curl_setopt($curl_instance, CURLOPT_RETURNTRANSFER, 1);
-        $output = curl_exec($curl_instance); 
-        curl_close($curl_instance); 
+        $output = curl_exec($curl_instance);  
 
         $ethercalc_path = islandora_data_get_response_header($output, 'Location');
 
@@ -215,6 +214,7 @@ function islandora_data_preprocess_islandora_data(array &$variables) {
         'title' => t('CSV files, one per worksheet'), 'type' => 'ul', 'attributes' => array()));
     }
   }
+  curl_close($curl_instance);
 }
 
 /**
