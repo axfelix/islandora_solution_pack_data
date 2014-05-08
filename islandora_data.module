@@ -163,6 +163,7 @@ function islandora_data_preprocess_islandora_data(array &$variables) {
         $curl_instance = curl_init();
         curl_setopt($curl_instance, CURLOPT_URL, $ethercalc_host.'/_');
         curl_setopt($curl_instance, CURLOPT_POST, 1);
+        curl_setopt($curl_instance, CURLOPT_TIMEOUT, 2);
         curl_setopt($curl_instance, CURLOPT_POSTFIELDS, file_get_contents($ds_content_file_path));
         curl_setopt($curl_instance, CURLOPT_HEADER, 1);
         curl_setopt($curl_instance, CURLOPT_HTTPHEADER, array("Content-Type: text/csv"));
