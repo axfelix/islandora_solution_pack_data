@@ -192,10 +192,8 @@ function islandora_data_preprocess_islandora_data(array &$variables) {
 
         // Clean up the temp file containing the datastream content.
         file_unmanaged_delete($ds_content_file_path);
-      }
-    }
 
-    // If curl executed successfully, just render the links.
+        // If curl executed successfully, just render the links.
     if(curl_errno($curl_instance)==0) {
       $variables['islandora_content'] = theme('item_list', array('items' => $ds_links, 
         'title' => t('CSV files, one per worksheet'), 'type' => 'ul', 'attributes' => array()));
@@ -212,9 +210,12 @@ function islandora_data_preprocess_islandora_data(array &$variables) {
       }
       $variables['islandora_content'] .= theme('item_list', array('items' => $ds_links, 
         'title' => t('CSV files, one per worksheet'), 'type' => 'ul', 'attributes' => array()));
+      }
+      curl_close($curl_instance);
+    }
+
     }
   }
-  curl_close($curl_instance);
 }
 
 /**
