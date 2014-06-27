@@ -114,7 +114,7 @@ function islandora_data_preprocess_islandora_data(array &$variables) {
   module_load_include('inc', 'islandora', 'includes/datastream');
   module_load_include('inc', 'islandora', 'includes/utilities');
 
-  if (islandora_datastream_access(FEDORA_VIEW_OBJECTS, $islandora_object['DC'])) {
+  if (islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $islandora_object['DC'])) {
     try {
       $dc = $islandora_object['DC']->content;
       $dc_object = DublinCore::importFromXMLString($dc);
@@ -131,7 +131,7 @@ function islandora_data_preprocess_islandora_data(array &$variables) {
   $variables['parent_collections'] = islandora_get_parents_from_rels_ext($islandora_object);
 
   // Thumbnail.
-  if (isset($islandora_object['TN']) && islandora_datastream_access(FEDORA_VIEW_OBJECTS, $islandora_object['TN'])) {
+  if (isset($islandora_object['TN']) && islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $islandora_object['TN'])) {
     $thumbnail_size_url = url("islandora/object/{$islandora_object->id}/datastream/TN/view");
     $params = array(
       'title' => $islandora_object->label,
@@ -143,7 +143,7 @@ function islandora_data_preprocess_islandora_data(array &$variables) {
   // CSV datastream(s). 
   // First, define a default for the return code from curl.
   $ret = 1;
-  if (isset($islandora_object['OBJ']) && islandora_datastream_access(FEDORA_VIEW_OBJECTS, $islandora_object['OBJ'])) {
+  if (isset($islandora_object['OBJ']) && islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $islandora_object['OBJ'])) {
     $ds_links = array();
     foreach ($islandora_object as $ds) {
       // We only want to present links to the Ethercalc URLs for datastreams that begin with 'CSV_DATA'.
@@ -163,7 +163,6 @@ function islandora_data_preprocess_islandora_data(array &$variables) {
         $curl_instance = curl_init();
         curl_setopt($curl_instance, CURLOPT_URL, $ethercalc_host.'/_');
         curl_setopt($curl_instance, CURLOPT_POST, 1);
-        curl_setopt($curl_instance, CURLOPT_TIMEOUT, 2);
         curl_setopt($curl_instance, CURLOPT_POSTFIELDS, file_get_contents($ds_content_file_path));
         curl_setopt($curl_instance, CURLOPT_HEADER, 1);
         curl_setopt($curl_instance, CURLOPT_HTTPHEADER, array("Content-Type: text/csv"));
