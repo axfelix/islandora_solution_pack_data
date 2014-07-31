@@ -161,20 +161,24 @@ function islandora_data_preprocess_islandora_data(array &$variables) {
 
         // PHP Curl POST:
         $curl_instance = curl_init();
-        curl_setopt($curl_instance, CURLOPT_URL, $ethercalc_host.'/_');
-        curl_setopt($curl_instance, CURLOPT_POST, 1);
-        curl_setopt($curl_instance, CURLOPT_POSTFIELDS, file_get_contents($ds_content_file_path));
-        curl_setopt($curl_instance, CURLOPT_HEADER, 1);
-        curl_setopt($curl_instance, CURLOPT_HTTPHEADER, array("Content-Type: text/csv"));
-        curl_setopt($curl_instance, CURLOPT_RETURNTRANSFER, 1);
-        $output = curl_exec($curl_instance);  
 
-        $ethercalc_path = islandora_data_get_response_header($output, 'Location');
+        // Don't try posting if the file is extremely large; Ethercalc will hang
+        if ($ds_content_file_size <= 52,428,700) {
+          curl_setopt($curl_instance, CURLOPT_URL, $ethercalc_host.'/_');
+          curl_setopt($curl_instance, CURLOPT_POST, 1);
+          curl_setopt($curl_instance, CURLOPT_POSTFIELDS, file_get_contents($ds_content_file_path));
+          curl_setopt($curl_instance, CURLOPT_HEADER, 1);
+          curl_setopt($curl_instance, CURLOPT_HTTPHEADER, array("Content-Type: text/csv"));
+          curl_setopt($curl_instance, CURLOPT_RETURNTRANSFER, 1);
+          $output = curl_exec($curl_instance); 
+          $curl_ran = 1;
 
+          $ethercalc_path = islandora_data_get_response_header($output, 'Location');
+        }
         // 2) Ethercalc renders a Javascript viewer at curl http://example.com:8000/zmy8gm660u, which we
         // want to appear in a new browser tab. If curl executed successfully, render links to the
         // Ethercalc URLs.
-        if(curl_errno($curl_instance)==0) {
+        if(curl_errno($curl_instance)==0 && $curl_ran==1) {
           $link = l(t("View @ds_label in Ethercalc", array('@ds_label' => $ds->label) ), 
             url($ethercalc_host . $ethercalc_path,
             array('absolute' => TRUE, 'external' => TRUE)), 
@@ -202,11 +206,11 @@ function islandora_data_preprocess_islandora_data(array &$variables) {
     else {
       if (count($ds_links) == 1) {
         $variables['islandora_content'] = '<div class="messages warning">' . 
-          t("Sorry, the Ethercalc service is not responding so we can't display your CSV file. You can download it using the link below.") . '</div>';
+          t("Sorry, we can't display your CSV file in the browser -- either it's too large, or we're encountering some technical difficulties. You can download it using the link below.") . '</div>';
       }
       else {
         $variables['islandora_content'] = '<div class="messages warning">' .
-          t("Sorry, the Ethercalc service is not responding so we can't display your CSV files. You can download them using the links below.") . '</div>';
+          t("Sorry, we can't display at least one of your CSV files in the browser -- either they're too large, or we're encountering some technical difficulties. You can download them using the links below.") . '</div>';
       }
       $variables['islandora_content'] .= theme('item_list', array('items' => $ds_links, 
         'title' => t('CSV files, one per worksheet'), 'type' => 'ul', 'attributes' => array()));
