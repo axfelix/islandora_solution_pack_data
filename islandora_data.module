@@ -140,7 +140,7 @@ function islandora_data_preprocess_islandora_data(array &$variables) {
     $variables['islandora_thumbnail_img'] = theme('image', $params);
   }
 
-  // CSV datastream(s). 
+  // CSV datastream(s).
   // First, define a default for the return code from curl.
   $ret = 1;
   if (isset($islandora_object['OBJ']) && islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $islandora_object['OBJ'])) {
@@ -163,14 +163,14 @@ function islandora_data_preprocess_islandora_data(array &$variables) {
         $curl_instance = curl_init();
 
         // Don't try posting if the file is extremely large; Ethercalc will hang
-        if ($ds_content_file_size <= 52,428,700) {
+        if ($ds_content_file_size <= 52428700) {
           curl_setopt($curl_instance, CURLOPT_URL, $ethercalc_host.'/_');
           curl_setopt($curl_instance, CURLOPT_POST, 1);
           curl_setopt($curl_instance, CURLOPT_POSTFIELDS, file_get_contents($ds_content_file_path));
           curl_setopt($curl_instance, CURLOPT_HEADER, 1);
           curl_setopt($curl_instance, CURLOPT_HTTPHEADER, array("Content-Type: text/csv"));
           curl_setopt($curl_instance, CURLOPT_RETURNTRANSFER, 1);
-          $output = curl_exec($curl_instance); 
+          $output = curl_exec($curl_instance);
           $curl_ran = 1;
 
           $ethercalc_path = islandora_data_get_response_header($output, 'Location');
@@ -179,15 +179,15 @@ function islandora_data_preprocess_islandora_data(array &$variables) {
         // want to appear in a new browser tab. If curl executed successfully, render links to the
         // Ethercalc URLs.
         if(curl_errno($curl_instance)==0 && $curl_ran==1) {
-          $link = l(t("View @ds_label in Ethercalc", array('@ds_label' => $ds->label) ), 
+          $link = l(t("View @ds_label in Ethercalc", array('@ds_label' => $ds->label) ),
             url($ethercalc_host . $ethercalc_path,
-            array('absolute' => TRUE, 'external' => TRUE)), 
+            array('absolute' => TRUE, 'external' => TRUE)),
             array('attributes' => array('target' => '_blank', 'title' => t('Opens Ethercalc in a new tab')))
           );
         }
         // If curl didn't execute successfully, render links to download the raw CSV files.
         else {
-          $link = l(t("Download @dsid", array('@dsid' => $ds->id)), 
+          $link = l(t("Download @dsid", array('@dsid' => $ds->id)),
             islandora_datastream_get_url($ds, $type = 'download')
           );
         }
@@ -199,20 +199,20 @@ function islandora_data_preprocess_islandora_data(array &$variables) {
 
         // If curl executed successfully, just render the links.
     if(curl_errno($curl_instance)==0) {
-      $variables['islandora_content'] = theme('item_list', array('items' => $ds_links, 
+      $variables['islandora_content'] = theme('item_list', array('items' => $ds_links,
         'title' => t('CSV files, one per worksheet'), 'type' => 'ul', 'attributes' => array()));
     }
     // If curl didn't execute successfully, render a note to the user and the links to download the raw CSV files.
     else {
       if (count($ds_links) == 1) {
-        $variables['islandora_content'] = '<div class="messages warning">' . 
+        $variables['islandora_content'] = '<div class="messages warning">' .
           t("Sorry, we can't display your CSV file in the browser -- either it's too large, or we're encountering some technical difficulties. You can download it using the link below.") . '</div>';
       }
       else {
         $variables['islandora_content'] = '<div class="messages warning">' .
           t("Sorry, we can't display at least one of your CSV files in the browser -- either they're too large, or we're encountering some technical difficulties. You can download them using the links below.") . '</div>';
       }
-      $variables['islandora_content'] .= theme('item_list', array('items' => $ds_links, 
+      $variables['islandora_content'] .= theme('item_list', array('items' => $ds_links,
         'title' => t('CSV files, one per worksheet'), 'type' => 'ul', 'attributes' => array()));
       }
       curl_close($curl_instance);
@@ -287,4 +287,3 @@ function islandora_data_get_response_header($curl_result, $wanted_header) {
     }
   }
 }
-
