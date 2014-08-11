@@ -198,7 +198,7 @@ function islandora_data_preprocess_islandora_data(array &$variables) {
         file_unmanaged_delete($ds_content_file_path);
 
         // If curl executed successfully, just render the links.
-    if(curl_errno($curl_instance)==0) {
+    if(curl_errno($curl_instance)==0 && $curl_ran==1) {
       $variables['islandora_content'] = theme('item_list', array('items' => $ds_links,
         'title' => t('CSV files, one per worksheet'), 'type' => 'ul', 'attributes' => array()));
     }
