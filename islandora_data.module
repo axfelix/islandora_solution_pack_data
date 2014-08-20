@@ -279,7 +279,7 @@ function islandora_data_islandora_sp_data_islandora_ingest_steps() {
  */
 function islandora_data_get_response_header($curl_result, $wanted_header) {
   list($headers, $content) = explode("\r\n\r\n", $curl_result, 2);
-  foreach (explode("\r\n", $headers) as $header) {
+  foreach (explode("\r\n", $content) as $header) {
     if (preg_match('/'. preg_quote($wanted_header) . '/', $header)) {
       $header_value = str_replace($wanted_header . ':', '', $header);
       $cleaned_underscore = str_replace('_/','', $header_value);
