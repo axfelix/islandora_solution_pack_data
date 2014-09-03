@@ -2,11 +2,11 @@
 
 /**
  * @file
- * Handles the uploading of the image file.
+ * Handles the uploading of the data file.
  */
 
 /**
- * Defines a file upload form for uploading the basic image.
+ * Defines a file upload form for uploading the spreadsheet.
  *
  * @param array $form
  *   The Drupal form.
@@ -24,7 +24,7 @@ function islandora_data_upload_form(array $form, array &$form_state) {
       '#title' => t('Data'),
       '#type' => 'managed_file',
       '#required' => TRUE,
-      '#description' => t('Select image to upload.<br/>Files must be less than <b>@size MB.</b><br/>Allowed file types: <b>@ext.</b>', array('@size' => $upload_size, '@ext' => $extensions[0])),
+      '#description' => t('Select file to upload.<br/>Files must be less than <b>@size MB.</b><br/>Allowed file types: <b>@ext.</b>', array('@size' => $upload_size, '@ext' => $extensions[0])),
       '#default_value' => isset($form_state['values']['files']) ? $form_state['values']['files'] : NULL,
       '#upload_location' => 'temporary://',
       '#upload_validators' => array(
