@@ -20,7 +20,7 @@ if xlsx is None:
 	call(['ssconvert','--export-type=Gnumeric_Excel:xlsx',sys.argv[1],workbookname])
 else:
 	workbookname = sys.argv[1]
-workbook = openpyxl.load_workbook(workbookname)
+workbook = openpyxl.load_workbook(workbookname, use_iterators=True)
 sheets = workbook.get_sheet_names()
 totalsheets = len(sheets)
 if totalsheets!=1:
