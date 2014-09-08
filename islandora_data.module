@@ -161,6 +161,7 @@ function islandora_data_preprocess_islandora_data(array &$variables) {
 
         // PHP Curl POST:
         $curl_instance = curl_init();
+        $curl_ran = 0;
 
         // Don't try posting if the file is extremely large; Ethercalc will hang
         if ($ds_content_file_size <= 5000000) {
