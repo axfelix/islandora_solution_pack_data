@@ -200,7 +200,7 @@ function islandora_data_preprocess_islandora_data(array &$variables) {
 
         // If curl executed successfully, just render the links.
     if(curl_errno($curl_instance)==0 && $curl_ran==1) {
-      $variables['islandora_content'] = theme('item_list', array('items' => $ds_links,
+      $variables['islandora_content'] = theme('islandora_objects', array('items' => $ds_links,
         'title' => t('CSV files, one per worksheet'), 'type' => 'ul', 'attributes' => array()));
     }
     // If curl didn't execute successfully, render a note to the user and the links to download the raw CSV files.
