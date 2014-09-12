@@ -20,7 +20,7 @@
   <div class="islandora-basic-image-sidebar">
     <?php if (!empty($dc_array['dc:description']['value'])): ?>
       <h2><?php print $dc_array['dc:description']['label']; ?></h2>
-      <p><?php print $dc_array['dc:description']['value']; ?></p>
+      <p><?php print str_replace("\n","<br>",$dc_array['dc:description']['value']); ?></p>
     <?php endif; ?>
     <?php if ($parent_collections): ?>
       <div>
