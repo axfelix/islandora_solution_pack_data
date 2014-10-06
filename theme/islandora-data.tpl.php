@@ -33,6 +33,19 @@
       </div>
     <?php endif; ?>
   </div>
+  <div>
+  <h2>Cite as</h2>
+  <p>
+  <?php print_r($dc_array["dc:creator"]["value"]);
+  print " (";
+  print_r(substr($dc_array["dc:date"]["value"], 0, 4));
+  print "): ";
+  print_r($dc_array["dc:title"]["value"]);
+  print ". http://researchdata.sfu.ca/islandora/object/";
+  print_r($dc_array["dc:identifier"]["value"]);
+  print "."; ?>
+  </p>
+  </div>
   <?php print $metadata; ?>
   </div>
 </div>
