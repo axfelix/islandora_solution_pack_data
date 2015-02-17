@@ -7,12 +7,10 @@ Prerequisites:
 Dependencies provided by installer script (tested on Ubuntu):
 
 -nodejs (note: the version in Ubuntu sources is out of date; this script should
- automatically add a more up to date PPA on Ubuntu, but not tested against other 
- distributions)
+ automatically add a more up to date PPA on Ubuntu, but not tested against other distributions)
 -Ethercalc (ethercalc.net)
 -nodejs and redis (required by Ethercalc)
--Gnumeric (used to convert spreadsheet formats; may add a boatload of Gtk and/or 
- X stuff on non-Gnome environments)
+-Gnumeric (used to convert spreadsheet formats; may add a boatload of Gtk and/or X stuff on non-Gnome environments)
 -Python csvkit (includes openpyxl)
 
 Currently accepts upload of tabular data in XLSX, XLS, ODS, and CSV format. All 
@@ -28,10 +26,7 @@ our repository automatically passes it to a new instance of Ethercalc using a
 simple POST command. These files can then be edited in the browser and 
 downloaded as CSV if desired.
 
-Our script configures Ethercalc to run with the flag "expire -86400", which means
-that each of these Ethercalc document instances is automatically deleted one day 
-(86400 seconds) after the last time it is edited. These are effectively temporary
-files and should be treated as such -- the generated URL can be shared for short-term 
-collaboration, but we do not intend for a document editor to run on top of our
-repository; Ethercalc is mainly used to provide a nice in-browser view for CSV files.
+Our script configures Ethercalc to run with the flag "expire -86400", which means that each of these Ethercalc document instances is automatically deleted one day.
+
+(86400 seconds) after the last time it is edited. These are effectively temporary files and should be treated as such -- the generated URL can be shared for short-term collaboration, but we do not intend for a document editor to run on top of our repository; Ethercalc is mainly used to provide a nice in-browser view for CSV files.
 
