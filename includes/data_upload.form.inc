@@ -18,7 +18,7 @@
  */
 function islandora_data_upload_form(array $form, array &$form_state) {
   $upload_size = min((int) ini_get('post_max_size'), (int) ini_get('upload_max_filesize'));
-  $extensions = array('xls xlsx csv ods');
+  $extensions = array('xls xlsx csv ods sav');
   return array(
     'file' => array(
       '#title' => t('Data'),

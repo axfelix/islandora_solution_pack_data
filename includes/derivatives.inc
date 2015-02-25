@@ -108,6 +108,11 @@ function islandora_data_generate_csv_datastreams($deriv_source_file_path, $ext) 
         $input_file_path . ' ' . $current_process_id;
       exec($command, $output, $ret);
       break;
+    case 'sav':
+      // Run pspp-convert instead to directly convert SPSS to CSV
+      $command = 'pspp-convert' . ' ' . $input_file_path . ' ' . '/tmp/csvlist.' . $current_process_id;
+      exec($command, $output, $rest);
+      break;
     case 'csv':
       // Skip csvnormalize.py and just write the path to the native .csv file to the derivatives list.
       file_put_contents('/tmp/csvlist.' . $current_process_id, $input_file_path . "\n");

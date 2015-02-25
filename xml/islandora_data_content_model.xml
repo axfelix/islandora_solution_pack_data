@@ -5,6 +5,7 @@
     <!--
   <mimetypes>
     <type>application/vnd.ms-excel</type>
+    <type>application/x-spss-sav</type>
     <type>application/vnd.oasis.opendocument.spreadsheet</type>
     <type>text/csv</type>
   </mimetypes>

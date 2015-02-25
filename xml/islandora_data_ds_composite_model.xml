@@ -22,6 +22,7 @@
   </dsTypeModel>
   <dsTypeModel ID="OBJ">
     <form MIME="application/vnd.ms-excel"></form>
+    <form MIME="application/x-spss-sav"></form>
     <form MIME="application/vnd.oasis.opendocument.spreadsheet"></form>
     <form MIME="text/csv"></form>
   </dsTypeModel>

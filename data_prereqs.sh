@@ -6,11 +6,14 @@ sudo yum -y install redis
 sudo yum -y install gnumeric
 sudo yum -y install python-pip
 sudo yum -y install npm
+sudo yum -y install pspp
 fi
 
 if [ -n "$(command -v apt-get)" ]; then
+sudo add-apt-repository -y ppa:adamzammit/pspp
 sudo add-apt-repository -y ppa:chris-lea/node.js
 sudo apt-get update
+sudo apt-get -y install pspp
 sudo apt-get -y install nodejs
 sudo apt-get -y install redis-server
 sudo apt-get -y install gnumeric
