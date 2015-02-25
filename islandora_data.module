@@ -280,6 +280,11 @@ function islandora_data_islandora_sp_data_islandora_ingest_steps() {
  * @return bool|string
  *   The value of the header, FALSE if header not found.
  */
+
+
+/**
+ * Parses header response from Ethercalc.
+ */
 function islandora_data_get_response_header($curl_result, $wanted_header) {
   foreach (explode("\r\n", $curl_result) as $header) {
     if (preg_match('/'. preg_quote($wanted_header) . '/', $header)) {
