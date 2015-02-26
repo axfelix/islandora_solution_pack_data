@@ -11,7 +11,7 @@
 <div class="islandora-basic-image-object islandora">
   <div class="islandora-basic-image-content-wrapper clearfix">
     <?php if (isset($islandora_content)): ?>
-      <div class="islandora-basic-image-content">
+      <div class="message">
         <?php print $islandora_content;
         print "\n";
         exec('curl -i -H "Content-Type: text/csv" -X POST --data-binary @'.$islandora_content.' http://localhost:8000/');
