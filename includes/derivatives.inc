@@ -110,7 +110,7 @@ function islandora_data_generate_csv_datastreams($deriv_source_file_path, $ext) 
       break;
     case 'sav':
       // Run pspp-convert instead to directly convert SPSS to CSV
-      $command = 'pspp-convert' . ' ' . $input_file_path . ' ' . '/tmp/csvlist.' . $current_process_id;
+      $command = 'pspp-convert' . ' -O csv ' . $input_file_path . ' ' . '/tmp/csvlist.' . $current_process_id;
       exec($command, $output, $rest);
       break;
     case 'csv':
