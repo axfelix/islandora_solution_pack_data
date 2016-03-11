@@ -187,13 +187,12 @@ function islandora_data_preprocess_islandora_data(array &$variables) {
             array('absolute' => TRUE, 'external' => TRUE)),
             array('attributes' => array('target' => '_blank', 'title' => t('Opens Ethercalc in a new tab')))
           );
+          $ds_links[] = $link;
         }
-        // If curl didn't execute successfully, render links to download the raw CSV files.
-        else {
-          $link = l(t("Download @dsid", array('@dsid' => $ds->id)),
-            islandora_datastream_get_url($ds, $type = 'download')
-          );
-        }
+        // Add links to download the raw CSV files regardless of whether curl worked.
+        $link = l(t("Download @dsid", array('@dsid' => $ds->id)),
+          islandora_datastream_get_url($ds, $type = 'download')
+        );
 
         $ds_links[] = $link;
 
