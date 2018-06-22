@@ -22,3 +22,12 @@ Our script configures Ethercalc to run with the flag "expire -86400", which mean
 
 (86400 seconds) after the last time it is edited. These are effectively temporary files and should be treated as such -- the generated URL can be shared for short-term collaboration, but we do not intend for a document editor to run on top of our repository; Ethercalc is mainly used to provide a nice in-browser view for CSV files.
 
+edit data_prereqs.sh line 23 and change '\' to '/'
+
+for unix users edit the data_prereqs.sh with vi
+
+``~$vi data_prereqs.sh``
+``:set ff=unix``
+``:wq``
+
+
